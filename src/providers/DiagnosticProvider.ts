@@ -212,28 +212,77 @@ export class LaravelDiagnosticProvider implements vscode.Disposable {
    */
   private checkDebugStatements(
     document: vscode.TextDocument,
-    text: string,
+    _text: string,
     messages: I18nMessages,
     diagnostics: vscode.Diagnostic[]
   ): void {
     const debugPatterns = [
-      { pattern: /\bdd\s*\(/g, name: 'dd()' },
-      { pattern: /\bdump\s*\(/g, name: 'dump()' },
-      { pattern: /\bvar_dump\s*\(/g, name: 'var_dump()' },
-      { pattern: /\bprint_r\s*\(/g, name: 'print_r()' },
+      /\bdd\s*\(/g,
+      /\bdump\s*\(/g,
+      /\bvar_dump\s*\(/g,
+      /\bprint_r\s*\(/g,
     ];
 
-    for (const debug of debugPatterns) {
-      let match;
-      while ((match = debug.pattern.exec(text)) !== null) {
-        const startIdx = match.index;
-        const endIdx = startIdx + match[0].length - 1; // exclude opening paren
-        const pos = document.positionAt(startIdx);
-        const endPos = document.positionAt(endIdx);
-        const range = new vscode.Range(pos, endPos);
-        diagnostics.push(this.createDiagnostic(range, messages.diag_debug_statement, vscode.DiagnosticSeverity.Error));
+    // Scan per baris supaya kita bisa membuang bagian komentar & string.
+    // Statement debug adalah PHP yang valid (bukan syntax error), jadi cukup
+    // Warning — bukan Error — supaya tidak terkesan kode user "rusak".
+    for (let lineNum = 0; lineNum < document.lineCount; lineNum++) {
+      const rawLine = document.lineAt(lineNum).text;
+      const scannable = this.maskCommentsAndStrings(rawLine);
+
+      for (const pattern of debugPatterns) {
+        pattern.lastIndex = 0;
+        let match;
+        while ((match = pattern.exec(scannable)) !== null) {
+          const startIdx = match.index;
+          const endIdx = startIdx + match[0].length - 1; // exclude opening paren
+          const range = new vscode.Range(
+            new vscode.Position(lineNum, startIdx),
+            new vscode.Position(lineNum, endIdx)
+          );
+          diagnostics.push(this.createDiagnostic(range, messages.diag_debug_statement, vscode.DiagnosticSeverity.Warning));
+        }
       }
     }
+  }
+
+  /**
+   * Mengganti isi komentar (// # ) dan string literal ('...' / "...") pada satu
+   * baris dengan spasi, sambil mempertahankan panjang & offset kolom.
+   * Tujuannya agar pattern matching tidak false-positive di dalam komentar/string,
+   * mis. `// pakai dd() buat debug` atau `$x = "print_r";`.
+   */
+  private maskCommentsAndStrings(line: string): string {
+    const chars = line.split('');
+    let inSingle = false;
+    let inDouble = false;
+
+    for (let i = 0; i < chars.length; i++) {
+      const ch = chars[i];
+
+      if (inSingle) {
+        if (ch === '\\') { chars[i] = ' '; if (i + 1 < chars.length) { chars[i + 1] = ' '; } i++; continue; }
+        if (ch === "'") { inSingle = false; }
+        chars[i] = ' ';
+        continue;
+      }
+      if (inDouble) {
+        if (ch === '\\') { chars[i] = ' '; if (i + 1 < chars.length) { chars[i + 1] = ' '; } i++; continue; }
+        if (ch === '"') { inDouble = false; }
+        chars[i] = ' ';
+        continue;
+      }
+
+      // Awal komentar satu baris: //, #  → buang sisa baris
+      if ((ch === '/' && chars[i + 1] === '/') || ch === '#') {
+        for (let j = i; j < chars.length; j++) { chars[j] = ' '; }
+        break;
+      }
+      if (ch === "'") { inSingle = true; chars[i] = ' '; continue; }
+      if (ch === '"') { inDouble = true; chars[i] = ' '; continue; }
+    }
+
+    return chars.join('');
   }
 
   /**

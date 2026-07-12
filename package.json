@@ -2,8 +2,8 @@
   "name": "laravel-tutor",
   "displayName": "Laravel Tutor",
   "description": "Laravel 13 inline hints for beginners — Bilingual ID/EN",
-  "version": "1.0.0",
-  "publisher": "AxonLabs",
+  "version": "1.0.3",
+  "publisher": "daffa-aditya-p",
   "license": "MIT",
   "icon": "logo.png",
   "galleryBanner": {
@@ -12,12 +12,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/AxonLabs/laravel-tutor.git"
+    "url": "https://github.com/daffa-aditya-p/laravel-tutor.git"
   },
   "bugs": {
-    "url": "https://github.com/AxonLabs/laravel-tutor/issues"
+    "url": "https://github.com/daffa-aditya-p/laravel-tutor/issues"
   },
-  "homepage": "https://github.com/AxonLabs/laravel-tutor#readme",
+  "homepage": "https://github.com/daffa-aditya-p/laravel-tutor#readme",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -59,6 +59,11 @@
           ],
           "default": "id",
           "description": "Language for Laravel Tutor hints (id for Bahasa Indonesia, en for English)"
+        },
+        "laravelTutor.inlayHints": {
+          "type": "boolean",
+          "default": false,
+          "description": "Tampilkan ghost text (inlay hint) inline di dalam kode. Default mati karena bisa mengganggu saat mengetik — penjelasan tetap tersedia lewat hover. / Show inline ghost text hints. Off by default; explanations still available on hover."
         }
       }
     },

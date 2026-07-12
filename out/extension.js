@@ -77,6 +77,14 @@ function activate(context) {
     // ============================================
     const configListener = (0, config_1.setupConfigListener)();
     context.subscriptions.push(configListener);
+    // Refresh ghost text saat setting laravelTutor.inlayHints di-toggle,
+    // supaya perubahan langsung terlihat tanpa perlu edit file dulu.
+    const inlayConfigListener = vscode.workspace.onDidChangeConfiguration(e => {
+        if (e.affectsConfiguration('laravelTutor.inlayHints')) {
+            inlayProvider.refresh();
+        }
+    });
+    context.subscriptions.push(inlayConfigListener);
     // ============================================
     // CREATE STATUS BAR ITEM
     // ============================================
@@ -181,8 +189,9 @@ function refreshAllProviders() {
         }
         // Refresh checklist
         checklistProvider.updateWebview();
-        // Note: Hover and Inlay Hints auto-refresh on next hover/typing
-        // because they call getLanguage() on each request
+        // Paksa inlay hints (ghost text) di-refresh agar ikut ganti bahasa.
+        // Hover auto-refresh di hover berikutnya karena baca getLanguage() tiap request.
+        inlayProvider.refresh();
     }
     catch (error) {
         console.error('Error refreshing providers:', error);

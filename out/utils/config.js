@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLanguage = getLanguage;
 exports.setLanguage = setLanguage;
 exports.getMessages = getMessages;
+exports.getInlayHintsEnabled = getInlayHintsEnabled;
 exports.setupConfigListener = setupConfigListener;
 exports.clearCache = clearCache;
 const vscode = __importStar(require("vscode"));
@@ -77,6 +78,16 @@ function getMessages() {
     }
     cachedMessages = getLanguage() === 'id' ? id_1.id : en_1.en;
     return cachedMessages;
+}
+/**
+ * Cek apakah fitur inlay hint (ghost text inline) diaktifkan.
+ * Default: false — ghost text mati supaya tidak mengganggu saat mengetik.
+ * Penjelasan method tetap tersedia lewat hover.
+ * @returns true jika user mengaktifkan lewat setting laravelTutor.inlayHints
+ */
+function getInlayHintsEnabled() {
+    const config = vscode.workspace.getConfiguration('laravelTutor');
+    return config.get('inlayHints', false);
 }
 /**
  * Setup listener untuk perubahan konfigurasi

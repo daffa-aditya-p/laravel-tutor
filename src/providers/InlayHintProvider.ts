@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { detectFileType } from '../utils/detector';
-import { getMessages } from '../utils/config';
+import { getMessages, getInlayHintsEnabled } from '../utils/config';
 import { I18nMessages } from '../i18n/types';
 
 /**
@@ -10,12 +10,30 @@ import { I18nMessages } from '../i18n/types';
 export class LaravelInlayHintProvider implements vscode.InlayHintsProvider, vscode.Disposable {
   private readonly MAX_FILE_SIZE = 2000; // Max lines to process for performance
 
+  // Event untuk memberitahu VSCode bahwa inlay hints perlu di-refresh.
+  // Dipakai saat bahasa di-toggle supaya ghost text ikut berubah tanpa
+  // perlu edit dokumen dulu.
+  private readonly _onDidChangeInlayHints = new vscode.EventEmitter<void>();
+  public readonly onDidChangeInlayHints = this._onDidChangeInlayHints.event;
+
+  /** Paksa VSCode meminta ulang inlay hints (mis. setelah ganti bahasa). */
+  public refresh(): void {
+    this._onDidChangeInlayHints.fire();
+  }
+
   public provideInlayHints(
     document: vscode.TextDocument,
     range: vscode.Range,
     token: vscode.CancellationToken
   ): vscode.ProviderResult<vscode.InlayHint[]> {
     const hints: vscode.InlayHint[] = [];
+
+    // Ghost text mati secara default (mengganggu saat mengetik).
+    // Hanya jalan kalau user mengaktifkan lewat setting laravelTutor.inlayHints.
+    if (!getInlayHintsEnabled()) {
+      return hints;
+    }
+
     const fileType = detectFileType(document);
     const messages = getMessages();
 
@@ -501,6 +519,6 @@ export class LaravelInlayHintProvider implements vscode.InlayHintsProvider, vsco
   }
 
   public dispose(): void {
-    // No disposables to clean up
+    this._onDidChangeInlayHints.dispose();
   }
 }

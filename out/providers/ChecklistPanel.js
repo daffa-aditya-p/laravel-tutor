@@ -47,8 +47,11 @@ class LaravelChecklistPanel {
     }
     resolveWebviewView(webviewView, context, _token) {
         this._view = webviewView;
+        // Panel ini murni statis (HTML + CSS). Tidak ada JavaScript yang dijalankan,
+        // jadi scripts dimatikan untuk memperkecil attack surface (defense-in-depth
+        // terhadap XSS bila suatu saat ada konten dari dokumen yang masuk ke HTML).
         webviewView.webview.options = {
-            enableScripts: true,
+            enableScripts: false,
             localResourceRoots: [this._extensionUri]
         };
         // Set initial HTML with CSP
@@ -81,8 +84,8 @@ class LaravelChecklistPanel {
             this._view.webview.html = this.getHtmlContent(`
         <div class="empty-state">
           <div class="icon">📂</div>
-          <p>${messages.panel_empty_title}</p>
-          <p class="hint">${messages.panel_empty_hint}</p>
+          <p>${this.escapeHtml(messages.panel_empty_title)}</p>
+          <p class="hint">${this.escapeHtml(messages.panel_empty_hint)}</p>
         </div>
       `);
             return;
@@ -95,8 +98,8 @@ class LaravelChecklistPanel {
             this._view.webview.html = this.getHtmlContent(`
         <div class="warning-state">
           <div class="icon">⚠️</div>
-          <p>${messages.panel_unknown_title}</p>
-          <p class="hint">${messages.panel_unknown_hint}</p>
+          <p>${this.escapeHtml(messages.panel_unknown_title)}</p>
+          <p class="hint">${this.escapeHtml(messages.panel_unknown_hint)}</p>
         </div>
       `);
             return;
@@ -117,9 +120,9 @@ class LaravelChecklistPanel {
                 checks = this.getRouteChecks(text, messages);
                 break;
         }
-        // Build HTML
+        // Build HTML — semua nilai dinamis di-escape sebelum masuk ke markup.
         let html = `<div class="header">
-      <h3>📋 Checklist ${(0, detector_1.getFileTypeLabel)(fileType)}</h3>
+      <h3>📋 Checklist ${this.escapeHtml((0, detector_1.getFileTypeLabel)(fileType))}</h3>
     </div>`;
         html += `<ul class="checklist">`;
         for (const check of checks) {
@@ -143,12 +146,12 @@ class LaravelChecklistPanel {
                         colorClass = 'warning';
                 }
             }
-            html += `<li class="${colorClass}">${icon} ${check.message}</li>`;
+            html += `<li class="${colorClass}">${icon} ${this.escapeHtml(check.message)}</li>`;
         }
         html += `</ul>`;
         // Calculate and add score
         const score = this.calculateScoreFromChecks(checks);
-        html += `<div class="score">${messages.panel_score}: ${score}/100</div>`;
+        html += `<div class="score">${this.escapeHtml(messages.panel_score)}: ${score}/100</div>`;
         this._view.webview.html = this.getHtmlContent(html);
     }
     /**
@@ -302,6 +305,18 @@ class LaravelChecklistPanel {
                 severity: 'error'
             }
         ];
+    }
+    /**
+     * Escape karakter HTML untuk mencegah HTML/JS injection (XSS) saat nilai
+     * dinamis dimasukkan ke markup webview.
+     */
+    escapeHtml(value) {
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
     }
     /**
      * Get HTML content with proper styling and CSP

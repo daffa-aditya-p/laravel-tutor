@@ -44,9 +44,23 @@ const config_1 = require("../utils/config");
 class LaravelInlayHintProvider {
     constructor() {
         this.MAX_FILE_SIZE = 2000; // Max lines to process for performance
+        // Event untuk memberitahu VSCode bahwa inlay hints perlu di-refresh.
+        // Dipakai saat bahasa di-toggle supaya ghost text ikut berubah tanpa
+        // perlu edit dokumen dulu.
+        this._onDidChangeInlayHints = new vscode.EventEmitter();
+        this.onDidChangeInlayHints = this._onDidChangeInlayHints.event;
+    }
+    /** Paksa VSCode meminta ulang inlay hints (mis. setelah ganti bahasa). */
+    refresh() {
+        this._onDidChangeInlayHints.fire();
     }
     provideInlayHints(document, range, token) {
         const hints = [];
+        // Ghost text mati secara default (mengganggu saat mengetik).
+        // Hanya jalan kalau user mengaktifkan lewat setting laravelTutor.inlayHints.
+        if (!(0, config_1.getInlayHintsEnabled)()) {
+            return hints;
+        }
         const fileType = (0, detector_1.detectFileType)(document);
         const messages = (0, config_1.getMessages)();
         // Performance guard - skip large files
@@ -382,7 +396,7 @@ class LaravelInlayHintProvider {
         }
     }
     dispose() {
-        // No disposables to clean up
+        this._onDidChangeInlayHints.dispose();
     }
 }
 exports.LaravelInlayHintProvider = LaravelInlayHintProvider;

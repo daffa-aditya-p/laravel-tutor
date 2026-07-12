@@ -49,6 +49,17 @@ export function getMessages(): I18nMessages {
 }
 
 /**
+ * Cek apakah fitur inlay hint (ghost text inline) diaktifkan.
+ * Default: false — ghost text mati supaya tidak mengganggu saat mengetik.
+ * Penjelasan method tetap tersedia lewat hover.
+ * @returns true jika user mengaktifkan lewat setting laravelTutor.inlayHints
+ */
+export function getInlayHintsEnabled(): boolean {
+  const config = vscode.workspace.getConfiguration('laravelTutor');
+  return config.get<boolean>('inlayHints', false);
+}
+
+/**
  * Setup listener untuk perubahan konfigurasi
  * Dipanggil sekali saat activate di extension.ts
  * @returns Disposable yang harus di-dispose saat deactivate

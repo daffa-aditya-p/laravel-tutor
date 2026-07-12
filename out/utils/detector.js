@@ -35,22 +35,12 @@ function detectFileType(document) {
     // ============================================
     // MODEL DETECTION
     // ============================================
-    // Path: /Models/, /app/ (tapi bukan /Http/, /Console/, /Exceptions/, /Providers/)
+    // Path: /Models/ saja yang dianggap sinyal path yang kuat.
+    // Folder /app/ lain TIDAK dipakai sebagai sinyal path karena terlalu longgar
+    // (bikin class biasa di app/ salah terdeteksi sebagai Model). Untuk model di
+    // luar /Models/ (mis. Laravel lama: app/User.php), andalkan sinyal KONTEN.
     // Content: extends Model, extends Authenticatable, extends Pivot, HasFactory, $fillable, $guarded
-    const isModelPath = uri.includes('/models/') ||
-        (uri.includes('/app/') &&
-            !uri.includes('/http/') &&
-            !uri.includes('/console/') &&
-            !uri.includes('/exceptions/') &&
-            !uri.includes('/providers/') &&
-            !uri.includes('/jobs/') &&
-            !uri.includes('/events/') &&
-            !uri.includes('/listeners/') &&
-            !uri.includes('/mail/') &&
-            !uri.includes('/notifications/') &&
-            !uri.includes('/policies/') &&
-            !uri.includes('/rules/') &&
-            !uri.includes('/services/'));
+    const isModelPath = uri.includes('/models/');
     const isModelContent = text.includes('extends Model') ||
         text.includes('extends Authenticatable') ||
         text.includes('extends Pivot') ||

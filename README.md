@@ -12,7 +12,7 @@ Tersedia dalam dua bahasa: Bahasa Indonesia dan English.
 
 ### 1. Tooltip Penjelasan Method
 
-Arahkan mouse ke method Laravel apa saja, dan kamu akan mendapatkan penjelasan lengkap tentang apa fungsi method tersebut, kapan应该 dipakai, dan contoh penggunaannya.
+Arahkan mouse ke method Laravel apa saja, dan kamu akan mendapatkan penjelasan lengkap tentang apa fungsi method tersebut, kapan dipakai, dan contoh penggunaannya.
 
 Cocok buat kamu yang masih sering lupa bedanya `hasMany` dan `belongsToMany`, atau kapan harus pakai `string()` vs `text()` di migration.
 
@@ -60,7 +60,7 @@ Klik status bar di pojok kanan bawah untuk ganti bahasa antara Bahasa Indonesia 
 3. Cari "Laravel Tutor"
 4. Klik Install
 
-Atau download langsung dari [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=AxonLabs.laravel-tutor).
+Atau download langsung dari [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=daffa-aditya-p.laravel-tutor).
 
 ### Cara Kerja
 
@@ -240,6 +240,19 @@ Kalau ada request fitur, silakan buka issue di GitHub.
 
 ## Changelog
 
+### Version 1.0.3
+
+- **Ghost text (inlay hint) sekarang MATI secara default.** Fitur ini sering bikin bingung saat mengetik karena tampil inline seolah bagian dari kode. Penjelasan method tetap tersedia lewat **hover**. Yang mau mengaktifkannya lagi bisa nyalakan setting `laravelTutor.inlayHints` (Settings → cari "Laravel Tutor")
+- Perubahan setting `laravelTutor.inlayHints` langsung berlaku tanpa perlu edit/reload file
+
+### Version 1.0.2
+
+- **Fix:** Diagnostic statement debug (`dd`, `dump`, `var_dump`, `print_r`) diturunkan dari **Error** menjadi **Warning** — statement ini PHP valid, bukan syntax error, jadi tidak lagi terkesan "kode kamu rusak"
+- **Fix:** Deteksi debug statement sekarang mengabaikan yang ada di dalam komentar dan string (tidak lagi false-positive di `// pakai dd() buat debug` atau `"print_r"`)
+- **Fix:** Deteksi tipe file lebih ketat — file PHP biasa di folder `app/` tidak lagi salah dianggap Model, sehingga hint & diagnostic tidak muncul di file non-Laravel
+- **Fix:** Ghost text (inlay hint) sekarang ikut refresh saat bahasa di-toggle tanpa perlu mengedit file dulu
+- **Security:** Webview checklist mematikan eksekusi script (`enableScripts: false`) dan meng-escape semua konten dinamis untuk mencegah HTML/JS injection (XSS)
+
 ### Version 1.0.0 (Initial Release)
 
 - Hover Provider untuk tooltip penjelasan method
@@ -301,7 +314,7 @@ MIT License — silakan pakai untuk belajar, ngajar, atau project pribadi.
 
 ## Tentang Developer
 
-Dikembangkan oleh **AxonLabs** — tim yang peduli dengan kualitas developer pemula di Indonesia.
+Dikembangkan oleh Daffa Aditya Pratama
 
 Kalau ekstensi ini membantu kamu, jangan lupa kasih rating di Marketplace ya!
 
@@ -311,9 +324,9 @@ Kalau ekstensi ini membantu kamu, jangan lupa kasih rating di Marketplace ya!
 
 - [Dokumentasi Laravel (Official)](https://laravel.com/docs)
 - [Laravel News](https://laravel-news.com)
-- [Laracasts](https://laracasts.com)
-- [GitHub Repository](https://github.com/AxonLabs/laravel-tutor)
-- [Report Issue](https://github.com/AxonLabs/laravel-tutor/issues)
+- [Laracasts](https://laracasts.com)tuh
+- [GitHub Repository](https://github.com/daffa-aditya-p/laravel-tutor)
+- [Report Issue](https://github.com/daffa-aditya-p/laravel-tutor/issues)
 
 ---
 
