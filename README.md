@@ -1,6 +1,6 @@
 # Laravel Tutor
 
-**Belajar Laravel 13 jadi lebih mudah — langsung di dalam kode kamu.**
+**Belajar Laravel 13 jadi lebih mudah - langsung di dalam kode kamu.**
 
 Laravel Tutor adalah ekstensi VSCode yang dirancang khusus untuk developer pemula yang sedang belajar Laravel. Ekstensi ini memberikan penjelasan, hint, dan feedback langsung saat kamu menulis kode Laravel — seperti punya mentor yang duduk di sebelah kamu.
 
@@ -16,7 +16,7 @@ Arahkan mouse ke method Laravel apa saja, dan kamu akan mendapatkan penjelasan l
 
 Cocok buat kamu yang masih sering lupa bedanya `hasMany` dan `belongsToMany`, atau kapan harus pakai `string()` vs `text()` di migration.
 
-### 2. Ghost Text Inline
+### 2. Ghost Text Inline (default dimatikan di versi terbaru sekarang)
 
 Saat kamu mengetik, Laravel Tutor menampilkan hint langsung di dalam editor. Kamu akan melihat informasi seperti:
 - Tipe kolom yang sedang kamu definisikan
